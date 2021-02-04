@@ -46,6 +46,14 @@ The Command Line Interface of `potranslator` and its documentation are based on 
 
 Optional: supports the Transifex collaborative service to upload the auto-generated translations to transifex_ for collaborative corrections of the translations.
 
+googletrans replaced by Google Cloud Translate
+==============================================
+
+to use Google Cloud Translate for full Google support, set GOOGLE_APPLICATION_CREDENTIALS environment variable to path to service account json:
+
+```
+set GOOGLE_APPLICATION_CREDENTIALS=C:\dev\build\google-svc-acc-translate.json
+```
 
 Supported Languages
 ===================
