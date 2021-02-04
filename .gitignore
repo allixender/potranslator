@@ -102,3 +102,6 @@ ENV/
 
 # Pycharm
 .idea/
+
+# google service account file
+google_svc-acc-translate.json

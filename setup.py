@@ -12,7 +12,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = ['Click>=6.0',
-                'googletrans==2.3.0',
+                'google-cloud-translate>=3.0',
                 'polib==1.1.0',
                 'path.py==11.0.1',
                 'importlib_resources==1.0.1',
@@ -32,7 +32,7 @@ test_requirements = ['pip==10.0.1',
                      'coverage==4.5.1',
                      'Sphinx==1.7.6',
                      'twine==1.11.0',
-                     'googletrans==2.3.0',
+                     'google-cloud-translate>=3.0',
                      'polib==1.1.0',
                      'importlib_resources==1.0.1',
                      ]
@@ -44,7 +44,7 @@ extras_require = {
 }
 
 setup(
-    version='1.1.5',
+    version='1.1.6',
     author="SekouD",
     author_email='sekoud.python@gmail.com',
     classifiers=[

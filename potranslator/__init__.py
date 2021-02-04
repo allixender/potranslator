@@ -3,8 +3,8 @@
 """Top-level package for potranslator."""
 
 __author__ = """SekouD"""
-__email__ = 'sekoud.python@gmail.com'
-__version__ = '1.1.5'
+__email__ = "sekoud.python@gmail.com"
+__version__ = "1.1.6"
 __copyright__ = "Copyright (c) 2017, SekouD"
 __credits__ = ("SekouD",)
 __license__ = "BSD"
@@ -13,7 +13,7 @@ __status__ = "Production"
 
 import json
 import polib
-from googletrans import Translator
+
 # import importlib_resources
 import pkg_resources
 import platform
@@ -32,14 +32,16 @@ _RESOURCE_PACKAGE = __name__
 # with importlib_resources.path(_RESOURCE_PACKAGE, 'supported_languages.json') as path:
 #     json_file = path
 
-_TRANSLATIONS_PATH = pkg_resources.resource_filename(_RESOURCE_PACKAGE, 'locale_dir')
+_TRANSLATIONS_PATH = pkg_resources.resource_filename(_RESOURCE_PACKAGE, "locale_dir")
 
-json_file = pkg_resources.resource_filename(_RESOURCE_PACKAGE, 'supported_languages.json')
+json_file = pkg_resources.resource_filename(
+    _RESOURCE_PACKAGE, "supported_languages.json"
+)
 
-with open(json_file, 'r', encoding='utf-8') as file:
+with open(json_file, "r", encoding="utf-8") as file:
     SUPPORTED_LANGUAGES = json.load(file)
 
-_TRANSLATED_LANGUAGES = [key for key in SUPPORTED_LANGUAGES if key != 'en']
+_TRANSLATED_LANGUAGES = [key for key in SUPPORTED_LANGUAGES if key != "en"]
 
 
 def _get_user_locale():
@@ -51,8 +53,9 @@ def _get_user_locale():
         The user locale.
 
     """
-    if 'Windows' in platform.system():
+    if "Windows" in platform.system():
         import ctypes
+
         windll = ctypes.windll.kernel32
         default_locale = windows_locale[windll.GetUserDefaultUILanguage()]
     else:
@@ -63,7 +66,7 @@ def _get_user_locale():
         else:
             user_locale = default_locale[:2]
     else:
-        user_locale = 'en'
+        user_locale = "en"
     return user_locale
 
 
@@ -87,9 +90,13 @@ def _getdoc(object):
 _user_locale = _get_user_locale()
 
 if _user_locale in _TRANSLATED_LANGUAGES:
-    _POTRANSLATOR_TRANSLATIONS = gettext.translation(domain='potranslator',
-                                                localedir=_TRANSLATIONS_PATH,
-                                                languages=[_user_locale], fallback=True, codeset='UTF-8')
+    _POTRANSLATOR_TRANSLATIONS = gettext.translation(
+        domain="potranslator",
+        localedir=_TRANSLATIONS_PATH,
+        languages=[_user_locale],
+        fallback=True,
+        codeset="UTF-8",
+    )
 else:
     _POTRANSLATOR_TRANSLATIONS = gettext.NullTranslations()
 
