@@ -51,9 +51,50 @@ googletrans replaced by Google Cloud Translate
 
 to use Google Cloud Translate for full Google support, set GOOGLE_APPLICATION_CREDENTIALS environment variable to path to service account json:
 
-```
-set GOOGLE_APPLICATION_CREDENTIALS=C:\dev\build\google-svc-acc-translate.json
-```
+.. code:: shell
+
+    set GOOGLE_APPLICATION_CREDENTIALS=C:\dev\build\google-svc-acc-translate.json
+
+Updates and using with sphinx
+=============================
+
+- https://www.sphinx-doc.org/en/master/usage/advanced/intl.html
+
+.. code:: shell
+
+    Install sphinx-intl.
+
+    $ pip install sphinx-intl
+
+    Add configurations to conf.py.
+
+    locale_dirs = ['locale/']   # path is example but recommended.
+    gettext_compact = False     # optional.
+
+    This case-study assumes that BUILDDIR is set to _build, locale_dirs is set to locale/ and gettext_compact is set to False (the Sphinx document is already configured as such).
+
+    Extract translatable messages into pot files.
+
+    $ make gettext
+
+    The generated pot files will be placed in the _build/gettext directory.
+
+    Generate po files.
+
+    We’ll use the pot files generated in the above step.
+
+    $ sphinx-intl update -p _build/gettext -l de -l ja
+
+    Translate po files -> with potranslator
+
+    potranslator update -p _build/gettext -l de -l ja
+
+    then make/build docs with target language
+
+    $ make -e SPHINXOPTS="-D language='de'" html
+
+
+
 
 Supported Languages
 ===================

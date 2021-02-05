@@ -2,6 +2,7 @@
 
 """Main module."""
 
+import os
 from os import listdir, makedirs
 from os.path import isfile, join, exists
 from . import polib, json
@@ -13,6 +14,7 @@ from datetime import datetime
 from codecs import open
 import sys
 import click
+from pathlib import Path
 
 try:
     from json.decoder import JSONDecodeError
@@ -159,13 +161,22 @@ class PoTranslator:
             )
         results = defaultdict(dict)
         for locale in locales:
-            po_files = [
-                file
-                for file in listdir(join(self.locale_dir, locale, "LC_MESSAGES"))
-                if file.endswith(".po")
-            ]
+            po_files = []
+            for dirpath, dirnames, filenames in os.walk(
+                join(self.locale_dir, locale, "LC_MESSAGES")
+            ):
+
+                sub_po_files = [
+                    os.path.join(dirpath, file)
+                    for file in filenames
+                    if file.endswith(".po")
+                ]
+                for pof in sub_po_files:
+                    po_files.append(pof)
+
             for po_file in po_files:
-                path = join(self.locale_dir, locale, "LC_MESSAGES", po_file)
+                # path = join(self.locale_dir, locale, "LC_MESSAGES", po_file)
+                path = po_file
                 results[locale][po_file], updated = self.translate(
                     path,
                     src_lang=src_lang,
@@ -204,15 +215,34 @@ class PoTranslator:
         :return: Dictionary.
             A dictionary of po files.
         """
+
+        base1 = Path(self.pot_dir)
+        bj = "##".join(base1.parts)
+
         pot = polib.pofile(filename, **{"encoding": encoding})
         results = {}
 
         for target_lang in target_langs:
-            po_file_name = filename.split("/")[-1].split("\\")[-1][:-1]
-            po_path = join(
-                self.locale_dir, "/".join((target_lang, "LC_MESSAGES", po_file_name))
-            )
-            po_dir = join(self.locale_dir, "/".join((target_lang, "LC_MESSAGES")))
+
+            po_file_path = Path(filename)
+            pj = "##".join(po_file_path.parent.parts)
+            upperb = pj.replace(bj, "")[2:].replace("##", "/")
+
+            # filename.split("/")[-1].split("\\")[-1][:-1]
+            po_file_name = po_file_path.name[:-1]
+            # print(f'from "{filename}" to short: {po_file_name}')
+            # po_path = str(
+            #     Path(self.locale_dir, target_lang, "LC_MESSAGES", po_file_name))
+            # )
+            # po_dir = join(self.locale_dir, "/".join((target_lang, "LC_MESSAGES")))
+            base_po_dir = Path(self.locale_dir, target_lang, "LC_MESSAGES")
+            if len(upperb) > 0:
+                base_po_dir = base_po_dir / upperb
+
+            po_path = str(base_po_dir / po_file_name)
+            po_dir = str(base_po_dir)
+            # print(f'new dirs: "{po_path}" "{po_dir}"')
+
             if not isfile(po_path):
                 if not exists(po_dir):
                     makedirs(po_dir)
@@ -260,15 +290,30 @@ class PoTranslator:
         :return: Dictionary.
             A dictionary of po files.
         """
-        pot_files = [file for file in listdir(self.pot_dir) if file.endswith(".pot")]
+        # pot_files = [file for file in listdir(self.pot_dir) if file.endswith(".pot")]
+        pot_files = []
+        ########
+        for dirpath, dirnames, filenames in os.walk(self.pot_dir):
+
+            sub_pot_files = [
+                os.path.join(dirpath, file)
+                for file in filenames
+                if file.endswith(".pot")
+            ]
+            for pof in sub_pot_files:
+                pot_files.append(pof)
+
         results = {}
         status = {
             "created": 0,
             "updated": 0,
             "not_changed": 0,
         }
+
+        ######
         for pot_file in pot_files:
-            path = join(self.pot_dir, pot_file)
+            # path = join(self.pot_dir, pot_file)
+            path = pot_file
             results[pot_file] = self.translate_from_pot(
                 path,
                 status,
