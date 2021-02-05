@@ -3,7 +3,8 @@ from google.cloud import translate
 import os
 import toolz
 from operator import add
-from functools import reduce
+from collections import OrderedDict
+import sys
 
 
 class TranslatedText(object):
@@ -28,7 +29,7 @@ class Translator(object):
         text should only be a list[list[str]]
         """
         mins = 5000
-        maxs = 30000
+        maxs = 20000
         steps = 1
         cutoffs = []
         for r in enumerate(toolz.accumulate(add, toolz.map(len, trans_text))):
@@ -64,6 +65,10 @@ class Translator(object):
 
         cuts = self.count_chars(trans_text)
 
+        data_dict = OrderedDict()
+        for i in cuts:
+            data_dict.update({str(i): template_request.copy()})
+
         request_batches = []
 
         if len(cuts) < 1:
@@ -73,17 +78,25 @@ class Translator(object):
         else:
             x = toolz.first(cuts)
             rest = list(toolz.drop(1, cuts))
-
+            data_dict[str(x)]["contents"] = []
             for et in enumerate(trans_text):
-                if x < et[0]:
-                    tr = template_request.copy()
-                    tr["contents"].append(et[1])
-                    request_batches.append(tr)
+                if et[0] < x:
+                    data_dict[str(x)]["contents"].append(et[1])
                 else:
                     cuts = rest
                     if len(cuts) > 0:
                         x = toolz.first(cuts)
                         rest = list(toolz.drop(1, cuts))
+                        data_dict[str(x)]["contents"] = []
+                        data_dict[str(x)]["contents"].append(et[1])
+                    else:
+                        data_dict[str(x)]["contents"].append(et[1])
+
+        for idx, req in data_dict.items():
+            print(
+                f"req {idx} -> {int(sys.getsizeof(req['contents'])) / 1024} kbytes ({len(req['contents'])} )"
+            )
+            request_batches.append(req)
 
         return request_batches
 

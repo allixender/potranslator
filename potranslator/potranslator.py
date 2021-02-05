@@ -95,7 +95,10 @@ class PoTranslator:
                 po.metadata["Translated-By"] = "potranslator {0}".format(__version__)
                 po.metadata["Last-Translator"] = "potranslator {0}".format(__version__)
                 po.metadata["Language"] = target_lang
-                po.metadata["PO-Revision-Date"] = str(datetime.today())
+                # po.metadata["PO-Revision-Date"] = str(datetime.today())
+                po.metadata["PO-Revision-Date"] = datetime.strftime(
+                    datetime.now(), "%Y-%m-%d %H:%M"
+                )
                 print(
                     _(
                         "{0} translations for the file {1} have been succesfully retrieved"
